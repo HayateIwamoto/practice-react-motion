@@ -4,6 +4,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
+import {useInview} from "./libs/inview";
+
 // import Swiper core and required modules
 import { Navigation, Pagination, Scrollbar, A11y } from "swiper/modules";
 
@@ -24,33 +26,12 @@ function App() {
   // Intersection Observerを使用して、要素がビューポートに入ったかどうかを検知
   const [inview, setInview] = useState(false);
   const listRef = useRef<HTMLUListElement>(null);
-  interface ObserverOptions {
-    threshold?: number;
-    rootMargin: string;
-  }
-  useEffect(() => {
-    const options: ObserverOptions = {
-      threshold: 0.1,
-      rootMargin: "-20% 0%",
-    };
-    const observer = new IntersectionObserver(([entry]) => {
-      /* 1回だけ実行の際はこちらを使用 */
-      if (entry.isIntersecting) {
-        setInview(true);
-        observer.disconnect();
-      }
-      /* 複数回実行はこちらを使用 */
-      // setInview(entry.isIntersecting);
-    }, options);
 
-    const target = listRef.current;
-    if (target) observer.observe(target);
-
-    return () => {
-      if (target) observer.unobserve(target); // 複数回実行する場合は、コメントアウト
-      observer.disconnect();
-    };
-  }, []);
+  useInview<HTMLUListElement>({
+    elementRef: listRef,
+    setInview,
+    once: false, // 1回だけ実行
+  });
 
   // GSAPを使用してアニメーションを実行
   const circle = useRef<HTMLDivElement>(null);
